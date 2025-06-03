@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, Menu } from 'lucide-react';
+import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,6 @@ export default function PodcastDashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [timeWindow, setTimeWindow] = useState<TimeWindow>('week');
   const [region, setRegion] = useState<Region>('se');
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Calculate filtered and sorted episodes
   const filteredEpisodes = useMemo(() => {
@@ -57,28 +56,14 @@ export default function PodcastDashboard() {
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center space-y-4 mb-8">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-            📊 Podcast Charts Explorer
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-3">
+            <BarChart3 className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-blue-400" />
+            Charts Explorer
           </h1>
-          <p className="text-gray-400 text-base sm:text-lg max-w-3xl mx-auto">
-            Track the best performing podcast episodes with our golf-style scoring system
-          </p>
-        </div>
-
-        {/* Mobile Filter Toggle */}
-        <div className="md:hidden mb-6">
-          <Button
-            variant="outline"
-            onClick={() => setShowMobileFilters(!showMobileFilters)}
-            className="w-full border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700"
-          >
-            <Menu className="h-4 w-4 mr-2" />
-            {showMobileFilters ? 'Hide Filters' : 'Show Filters'}
-          </Button>
         </div>
 
         {/* Controls */}
-        <Card className={`border-gray-800 bg-gray-900 mb-6 ${showMobileFilters ? 'block' : 'hidden md:block'}`}>
+        <Card className="border-gray-800 bg-gray-900 mb-6">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-gray-100">
               <TrendingUp className="h-5 w-5 text-blue-400" />
@@ -89,8 +74,7 @@ export default function PodcastDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Mobile Stacked Layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Region Selection */}
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2 text-gray-300">
@@ -131,23 +115,21 @@ export default function PodcastDashboard() {
                 </Select>
               </div>
 
-              {/* Time Navigation - Full Width on Mobile */}
+              {/* Time Navigation - Single Row */}
               {timeWindow !== 'all' && (
-                <div className="sm:col-span-2 lg:col-span-2 space-y-2">
+                <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-300">Date Range</label>
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleTimeWindowNavigation('prev')}
-                      className="flex items-center justify-center gap-1 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700"
+                      className="flex items-center justify-center gap-1 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 px-2"
                     >
                       <ChevronLeft className="h-4 w-4" />
-                      <span className="hidden sm:inline">Previous</span>
-                      <span className="sm:hidden">Prev</span>
                     </Button>
                     
-                    <div className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-center min-w-0 flex-1 sm:min-w-[180px] sm:flex-none">
+                    <div className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-center flex-1">
                       <span className="font-medium text-gray-200 text-sm">{dateRangeText}</span>
                     </div>
                     
@@ -155,35 +137,13 @@ export default function PodcastDashboard() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleTimeWindowNavigation('next')}
-                      className="flex items-center justify-center gap-1 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700"
+                      className="flex items-center justify-center gap-1 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 px-2"
                     >
-                      <span className="hidden sm:inline">Next</span>
-                      <span className="sm:hidden">Next</span>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Results Summary */}
-        <Card className="border-gray-800 bg-gray-900 mb-6">
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-              <div className="p-4">
-                <div className="text-2xl sm:text-3xl font-bold text-blue-400">{filteredEpisodes.length}</div>
-                <div className="text-sm text-gray-400 mt-1">Episodes Found</div>
-              </div>
-              <div className="p-4">
-                <div className="text-xl sm:text-2xl font-bold text-green-400">{getRegionLabel(region)}</div>
-                <div className="text-sm text-gray-400 mt-1">Current Region</div>
-              </div>
-              <div className="p-4">
-                <div className="text-xl sm:text-2xl font-bold text-purple-400">{getTimeWindowLabel(timeWindow)}</div>
-                <div className="text-sm text-gray-400 mt-1">Time Window</div>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -258,16 +218,6 @@ export default function PodcastDashboard() {
             </div>
           )}
         </div>
-
-        {/* Footer */}
-        <Card className="bg-gray-900 border-gray-800 mt-8">
-          <CardContent className="pt-6 text-center">
-            <p className="text-sm text-gray-400 leading-relaxed">
-              <strong className="text-gray-300">Scoring System:</strong> Golf-style scoring where lower scores indicate better performance. 
-              Rank #1 = 0 points, Rank #2 = 1 point, etc. Episodes accumulate points daily based on chart position.
-            </p>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
