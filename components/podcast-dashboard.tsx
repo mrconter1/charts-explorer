@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,9 +11,17 @@ import { mockEpisodes, filterEpisodesByDateRange, filterEpisodesByRegion, sortEp
 import { getDateRange, navigateTimeWindow, formatDateRange, getTimeWindowLabel } from '@/lib/date-utils';
 
 export default function PodcastDashboard() {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  // Use a fixed date initially to avoid hydration mismatch
+  const [currentDate, setCurrentDate] = useState(new Date('2024-12-15'));
   const [timeWindow, setTimeWindow] = useState<TimeWindow>('week');
   const [region, setRegion] = useState<Region>('se');
+  const [mounted, setMounted] = useState(false);
+
+  // Set actual current date after component mounts
+  useEffect(() => {
+    setMounted(true);
+    setCurrentDate(new Date());
+  }, []);
 
   // Calculate filtered and sorted episodes
   const filteredEpisodes = useMemo(() => {
@@ -51,6 +59,23 @@ export default function PodcastDashboard() {
     return 'bg-red-500/20 text-red-400 border-red-500/30';
   };
 
+  // Show loading state during hydration
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-gray-100">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <div className="text-center space-y-4 mb-8">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-3">
+              <BarChart3 className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-blue-400" />
+              Charts Explorer
+            </h1>
+          </div>
+          <div className="text-center text-gray-400">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -64,16 +89,7 @@ export default function PodcastDashboard() {
 
         {/* Controls */}
         <Card className="border-gray-800 bg-gray-900 mb-6">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-gray-100">
-              <TrendingUp className="h-5 w-5 text-blue-400" />
-              Dashboard Controls
-            </CardTitle>
-            <CardDescription className="text-gray-400">
-              Select your preferred time window and region to explore podcast performance
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Region Selection */}
               <div className="space-y-2">
@@ -150,14 +166,9 @@ export default function PodcastDashboard() {
 
         {/* Episodes List */}
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-100">
-              🏆 Top Performing Episodes
-            </h2>
-            <div className="text-sm text-gray-400 bg-gray-800 px-3 py-1 rounded-full">
-              Lower score = better performance
-            </div>
-          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-100">
+            🏆 Top Episodes
+          </h2>
           
           {filteredEpisodes.length === 0 ? (
             <Card className="border-gray-800 bg-gray-900">
