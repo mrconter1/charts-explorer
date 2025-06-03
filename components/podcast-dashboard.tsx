@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3, Loader2, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -74,11 +74,11 @@ export default function PodcastDashboard() {
     return region === 'se' ? '🇸🇪 Sweden' : '🇺🇸 United States';
   };
 
-  const getScoreColor = (score: number) => {
-    if (score <= 5) return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
-    if (score <= 10) return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-    if (score <= 15) return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
-    return 'bg-red-500/20 text-red-400 border-red-500/30';
+  // Convert Spotify URI to web URL
+  const getSpotifyUrl = (episodeUri: string) => {
+    // Convert "spotify:episode:1234" to "https://open.spotify.com/episode/1234"
+    const episodeId = episodeUri.replace('spotify:episode:', '');
+    return `https://open.spotify.com/episode/${episodeId}`;
   };
 
   // Show loading state during hydration
@@ -223,46 +223,41 @@ export default function PodcastDashboard() {
             </Card>
           ) : (
             <div className="flex-1 overflow-y-auto">
-              <div className="space-y-3 pb-4">
+              <div className="space-y-2 pb-4">
                 {episodes.map((episode, index) => (
                   <Card key={episode.id} className="border-gray-800 bg-gray-900 hover:bg-gray-800/50 transition-colors">
-                    <CardContent className="p-4 sm:p-6">
-                      <div className="flex flex-col space-y-4">
-                        {/* Top Row: Rank, Title, Score */}
-                        <div className="flex items-start gap-4">
-                          {/* Rank */}
-                          <div className="flex-shrink-0">
-                            <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center font-bold text-gray-200 text-sm">
-                              {index + 1}
-                            </div>
-                          </div>
-
-                          {/* Episode Info */}
-                          <div className="flex-grow min-w-0">
-                            <h3 className="font-semibold text-base sm:text-lg text-gray-100 leading-tight mb-1">
-                              {episode.episode_name}
-                            </h3>
-                            <p className="text-gray-400 font-medium text-sm sm:text-base">{episode.show_name}</p>
-                          </div>
-
-                          {/* Score Badge */}
-                          <div className="flex-shrink-0">
-                            <Badge className={`${getScoreColor(episode.score)} text-sm sm:text-base font-bold px-2 py-1 border`}>
-                              {episode.score} pts
-                            </Badge>
+                    <CardContent className="px-4 py-2">
+                      <div className="flex items-center gap-4">
+                        {/* Rank */}
+                        <div className="flex-shrink-0">
+                          <div className="w-7 h-7 bg-gray-700 rounded-full flex items-center justify-center font-bold text-gray-200 text-xs">
+                            {index + 1}
                           </div>
                         </div>
 
-                        {/* Description */}
-                        <p className="text-sm text-gray-500 pl-12 line-clamp-2 sm:line-clamp-1">
-                          {episode.show_description}
-                        </p>
-                        
-                        {/* Metadata */}
-                        <div className="flex flex-wrap items-center gap-3 pl-12 text-xs text-gray-500">
-                          <span>First appeared: {new Date(episode.first_appearance_date).toLocaleDateString()}</span>
-                          <span className="hidden sm:inline">•</span>
-                          <span>Region: {getRegionLabel(episode.region)}</span>
+                        {/* Episode Info */}
+                        <div className="flex-grow min-w-0">
+                          <h3 className="font-semibold text-base text-gray-100 leading-tight mb-1 line-clamp-1">
+                            {episode.episode_name}
+                          </h3>
+                          <div className="flex items-center gap-2 text-sm text-gray-400">
+                            <span className="font-medium">{episode.show_name}</span>
+                            <span>•</span>
+                            <span>{new Date(episode.first_appearance_date).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+
+                        {/* Listen Button */}
+                        <div className="flex-shrink-0">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(getSpotifyUrl(episode.episode_uri), '_blank')}
+                            className="flex items-center gap-2 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-white h-8 px-3"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            <span className="hidden sm:inline text-xs">Listen</span>
+                          </Button>
                         </div>
                       </div>
                     </CardContent>
