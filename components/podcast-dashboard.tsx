@@ -100,9 +100,9 @@ export default function PodcastDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 h-screen flex flex-col">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center space-y-4 mb-8 flex-shrink-0">
+        <div className="text-center space-y-4 mb-8">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-3">
             <BarChart3 className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-blue-400" />
             Charts Explorer
@@ -110,7 +110,7 @@ export default function PodcastDashboard() {
         </div>
 
         {/* Controls */}
-        <Card className="border-gray-800 bg-gray-900 mb-6 flex-shrink-0">
+        <Card className="border-gray-800 bg-gray-900 mb-6">
           <CardContent className="px-6 py-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Region Selection */}
@@ -189,20 +189,20 @@ export default function PodcastDashboard() {
         </Card>
 
         {/* Episodes List */}
-        <div className="flex-1 flex flex-col min-h-0">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-4 flex-shrink-0">
+        <div className="space-y-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-100">
             🏆 Top Episodes
           </h2>
           
           {loading ? (
-            <Card className="border-gray-800 bg-gray-900 flex-1 flex items-center justify-center">
+            <Card className="border-gray-800 bg-gray-900">
               <CardContent className="text-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-400" />
                 <p className="text-gray-400">Loading episodes...</p>
               </CardContent>
             </Card>
           ) : error ? (
-            <Card className="border-gray-800 bg-gray-900 flex-1 flex items-center justify-center">
+            <Card className="border-gray-800 bg-gray-900">
               <CardContent className="text-center py-12">
                 <div className="text-red-400">
                   <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -212,7 +212,7 @@ export default function PodcastDashboard() {
               </CardContent>
             </Card>
           ) : episodes.length === 0 ? (
-            <Card className="border-gray-800 bg-gray-900 flex-1 flex items-center justify-center">
+            <Card className="border-gray-800 bg-gray-900">
               <CardContent className="text-center py-12">
                 <div className="text-gray-500">
                   <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -222,48 +222,46 @@ export default function PodcastDashboard() {
               </CardContent>
             </Card>
           ) : (
-            <div className="flex-1 overflow-y-auto">
-              <div className="space-y-2 pb-4">
-                {episodes.map((episode, index) => (
-                  <Card key={episode.id} className="border-gray-800 bg-gray-900 hover:bg-gray-800/50 transition-colors">
-                    <CardContent className="px-4 py-2">
-                      <div className="flex items-center gap-4">
-                        {/* Rank */}
-                        <div className="flex-shrink-0">
-                          <div className="w-7 h-7 bg-gray-700 rounded-full flex items-center justify-center font-bold text-gray-200 text-xs">
-                            {index + 1}
-                          </div>
-                        </div>
-
-                        {/* Episode Info */}
-                        <div className="flex-grow min-w-0">
-                          <h3 className="font-semibold text-base text-gray-100 leading-tight mb-1 line-clamp-1">
-                            {episode.episode_name}
-                          </h3>
-                          <div className="flex items-center gap-2 text-sm text-gray-400">
-                            <span className="font-medium">{episode.show_name}</span>
-                            <span>•</span>
-                            <span>{new Date(episode.first_appearance_date).toLocaleDateString()}</span>
-                          </div>
-                        </div>
-
-                        {/* Listen Button */}
-                        <div className="flex-shrink-0">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => window.open(getSpotifyUrl(episode.episode_uri), '_blank')}
-                            className="flex items-center gap-2 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-white h-8 px-3"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            <span className="hidden sm:inline text-xs">Listen</span>
-                          </Button>
+            <div className="space-y-2 pb-8">
+              {episodes.map((episode, index) => (
+                <Card key={episode.id} className="border-gray-800 bg-gray-900 hover:bg-gray-800/50 transition-colors">
+                  <CardContent className="px-4 py-2">
+                    <div className="flex items-center gap-4">
+                      {/* Rank */}
+                      <div className="flex-shrink-0">
+                        <div className="w-7 h-7 bg-gray-700 rounded-full flex items-center justify-center font-bold text-gray-200 text-xs">
+                          {index + 1}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+
+                      {/* Episode Info */}
+                      <div className="flex-grow min-w-0">
+                        <h3 className="font-semibold text-base text-gray-100 leading-tight mb-1 line-clamp-1">
+                          {episode.episode_name}
+                        </h3>
+                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <span className="font-medium">{episode.show_name}</span>
+                          <span>•</span>
+                          <span>{new Date(episode.first_appearance_date).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+
+                      {/* Listen Button */}
+                      <div className="flex-shrink-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(getSpotifyUrl(episode.episode_uri), '_blank')}
+                          className="flex items-center gap-2 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-white h-8 px-3"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          <span className="hidden sm:inline text-xs">Listen</span>
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           )}
         </div>
