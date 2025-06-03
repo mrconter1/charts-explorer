@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Episode, Region, TimeWindow } from '@/types/podcast';
-import { mockEpisodes, filterEpisodesByDateRange, filterEpisodesByRegion, sortEpisodesByScore } from '@/lib/mock-data';
+import { fetchTopEpisodes } from '@/lib/episodes-service';
 import { getDateRange, navigateTimeWindow, formatDateRange, getTimeWindowLabel } from '@/lib/date-utils';
 
 export default function PodcastDashboard() {
@@ -16,6 +16,9 @@ export default function PodcastDashboard() {
   const [timeWindow, setTimeWindow] = useState<TimeWindow>('week');
   const [region, setRegion] = useState<Region>('se');
   const [mounted, setMounted] = useState(false);
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Set actual current date after component mounts
   useEffect(() => {
@@ -23,13 +26,32 @@ export default function PodcastDashboard() {
     setCurrentDate(new Date());
   }, []);
 
-  // Calculate filtered and sorted episodes
-  const filteredEpisodes = useMemo(() => {
-    const { startDate, endDate } = getDateRange(timeWindow, currentDate);
-    let episodes = filterEpisodesByRegion(mockEpisodes, region);
-    episodes = filterEpisodesByDateRange(episodes, startDate, endDate);
-    return sortEpisodesByScore(episodes);
-  }, [currentDate, timeWindow, region]);
+  // Fetch episodes when filters change
+  useEffect(() => {
+    if (!mounted) return;
+
+    const loadEpisodes = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const data = await fetchTopEpisodes({
+          region,
+          timeWindow,
+          currentDate,
+          limit: 25
+        });
+        setEpisodes(data);
+      } catch (err) {
+        console.error('Failed to fetch episodes:', err);
+        setError('Failed to load episodes. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEpisodes();
+  }, [mounted, region, timeWindow, currentDate]);
 
   const handleTimeWindowNavigation = (direction: 'prev' | 'next') => {
     if (timeWindow === 'all') return; // Can't navigate in "all" mode
@@ -141,6 +163,7 @@ export default function PodcastDashboard() {
                       size="sm"
                       onClick={() => handleTimeWindowNavigation('prev')}
                       className="flex items-center justify-center gap-1 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 px-2"
+                      disabled={loading}
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
@@ -154,6 +177,7 @@ export default function PodcastDashboard() {
                       size="sm"
                       onClick={() => handleTimeWindowNavigation('next')}
                       className="flex items-center justify-center gap-1 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 px-2"
+                      disabled={loading}
                     >
                       <ChevronRight className="h-4 w-4" />
                     </Button>
@@ -170,7 +194,24 @@ export default function PodcastDashboard() {
             🏆 Top Episodes
           </h2>
           
-          {filteredEpisodes.length === 0 ? (
+          {loading ? (
+            <Card className="border-gray-800 bg-gray-900 flex-1 flex items-center justify-center">
+              <CardContent className="text-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-400" />
+                <p className="text-gray-400">Loading episodes...</p>
+              </CardContent>
+            </Card>
+          ) : error ? (
+            <Card className="border-gray-800 bg-gray-900 flex-1 flex items-center justify-center">
+              <CardContent className="text-center py-12">
+                <div className="text-red-400">
+                  <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg mb-2">Error loading data</p>
+                  <p className="text-sm">{error}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : episodes.length === 0 ? (
             <Card className="border-gray-800 bg-gray-900 flex-1 flex items-center justify-center">
               <CardContent className="text-center py-12">
                 <div className="text-gray-500">
@@ -183,7 +224,7 @@ export default function PodcastDashboard() {
           ) : (
             <div className="flex-1 overflow-y-auto">
               <div className="space-y-3 pb-4">
-                {filteredEpisodes.map((episode, index) => (
+                {episodes.map((episode, index) => (
                   <Card key={episode.id} className="border-gray-800 bg-gray-900 hover:bg-gray-800/50 transition-colors">
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex flex-col space-y-4">
