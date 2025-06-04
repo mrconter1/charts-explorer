@@ -11,8 +11,8 @@ import { fetchTopEpisodes, getGlobalScoreRange } from '@/lib/episodes-service';
 
 export default function PodcastPage() {
   const params = useParams();
-  const showUri = params.showUri as string;
-  const decodedShowUri = decodeURIComponent(showUri);
+  const showId = params.showUri as string;
+  const showUri = `spotify:show:${showId}`;
   
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,7 +60,7 @@ export default function PodcastPage() {
         // Combine and filter by show URI
         const allEpisodes = [...seEpisodes, ...usEpisodes];
         const podcastEpisodes = allEpisodes
-          .filter(episode => episode.show_uri === decodedShowUri)
+          .filter(episode => episode.show_uri === showUri)
           .sort((a, b) => a.score - b.score); // Sort by score (lower = better)
 
         setEpisodes(podcastEpisodes);
@@ -80,10 +80,10 @@ export default function PodcastPage() {
       }
     };
 
-    if (decodedShowUri) {
+    if (showUri) {
       loadPodcastEpisodes();
     }
-  }, [decodedShowUri]);
+  }, [showUri]);
 
   // Transform raw score to display score
   const getDisplayScore = (rawScore: number): number => {
@@ -195,7 +195,7 @@ export default function PodcastPage() {
           </p>
           <div className="flex justify-between items-center pt-2 max-w-4xl mx-auto">
             <Button
-              onClick={() => window.open(getSpotifyShowUrl(decodedShowUri), '_blank')}
+              onClick={() => window.open(getSpotifyShowUrl(showUri), '_blank')}
               className="bg-green-600 hover:bg-green-500 text-white flex items-center gap-2 px-4 py-2"
             >
               <ExternalLink className="h-4 w-4" />

@@ -123,6 +123,12 @@ export default function PodcastDashboard() {
     return episodeUri;
   };
 
+  // Extract show ID from Spotify URI for cleaner URLs
+  const getShowId = (showUri: string): string => {
+    // Extract ID from "spotify:show:6WC2SZ3HqJgnUkxyrytzNc" -> "6WC2SZ3HqJgnUkxyrytzNc"
+    return showUri.replace('spotify:show:', '');
+  };
+
   // Transform raw score to display score (higher = better)
   const getDisplayScore = (rawScore: number): number => {
     if (!scoreRange) return 0;
@@ -357,7 +363,7 @@ export default function PodcastDashboard() {
                           {searchResults.map((podcast) => (
                             <Link 
                               key={podcast.show_uri} 
-                              href={`/podcast/${encodeURIComponent(podcast.show_uri)}`}
+                              href={`/podcast/${encodeURIComponent(getShowId(podcast.show_uri))}`}
                               onClick={() => {
                                 setSearchOpen(false);
                                 setSearchTerm('');
@@ -444,7 +450,7 @@ export default function PodcastDashboard() {
                         <div className="space-y-1">
                           <div className="text-sm text-gray-400">
                             <Link 
-                              href={`/podcast/${encodeURIComponent(episode.show_uri)}`}
+                              href={`/podcast/${encodeURIComponent(getShowId(episode.show_uri))}`}
                               className="font-medium hover:text-blue-400 transition-colors cursor-pointer flex items-center gap-1"
                             >
                               <span>{episode.show_name}</span>
