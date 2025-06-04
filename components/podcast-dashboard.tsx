@@ -440,9 +440,9 @@ export default function PodcastDashboard() {
                         <Button
                           size="sm"
                           onClick={() => window.open(getSpotifyUrl(episode.episode_uri), '_blank')}
-                          className="w-8 h-8 rounded-full !bg-green-600 hover:!bg-green-500 !border-green-600 hover:!border-green-500 !text-white hover:!text-white p-0 flex items-center justify-center"
+                          className="w-10 h-10 rounded-full !bg-green-600 hover:!bg-green-500 !border-green-600 hover:!border-green-500 !text-white hover:!text-white p-0 flex items-center justify-center"
                         >
-                          <Play className="h-3 w-3 fill-current" />
+                          <Play className="h-4 w-4 fill-current" />
                         </Button>
                       </div>
                     </div>
