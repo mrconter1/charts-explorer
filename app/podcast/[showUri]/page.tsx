@@ -146,16 +146,6 @@ export default function PodcastPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* Back Navigation */}
-        <div className="mb-6">
-          <Link href="/">
-            <Button variant="outline" className="border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 flex items-center gap-2">
-              <ChevronLeft className="h-4 w-4" />
-              Back to Charts
-            </Button>
-          </Link>
-        </div>
-
         {/* Podcast Header */}
         <div className="text-center space-y-4 mb-8">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
@@ -164,14 +154,20 @@ export default function PodcastPage() {
           <p className="text-lg text-gray-300 max-w-4xl mx-auto leading-relaxed">
             {podcastInfo.description}
           </p>
-          <div className="pt-2">
+          <div className="flex justify-between items-center pt-2 max-w-4xl mx-auto">
             <Button
               onClick={() => window.open(getSpotifyShowUrl(decodedShowUri), '_blank')}
-              className="bg-green-600 hover:bg-green-500 text-white flex items-center gap-2"
+              className="bg-green-600 hover:bg-green-500 text-white flex items-center gap-2 px-4 py-2"
             >
               <ExternalLink className="h-4 w-4" />
               Open in Spotify
             </Button>
+            <Link href="/">
+              <Button variant="outline" className="border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 flex items-center gap-2 px-4 py-2">
+                <ChevronLeft className="h-4 w-4" />
+                Back to Charts
+              </Button>
+            </Link>
           </div>
         </div>
 
