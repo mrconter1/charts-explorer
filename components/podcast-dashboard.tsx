@@ -99,6 +99,17 @@ export default function PodcastDashboard() {
     }
   };
 
+  // Check if navigating forward would go into the future
+  const wouldGoIntoFuture = (direction: 'next') => {
+    if (timeWindow === 'all') return false;
+    
+    const today = new Date();
+    const futureDate = navigateTimeWindow(currentDate, timeWindow, direction);
+    
+    // Check if the start of the future time window would be beyond today
+    return futureDate > today;
+  };
+
   const { startDate, endDate } = getDateRange(timeWindow, currentDate);
   const dateRangeText = formatDateRange(startDate, endDate, timeWindow);
 
@@ -261,7 +272,7 @@ export default function PodcastDashboard() {
                       size="sm"
                       onClick={() => handleTimeWindowNavigation('next')}
                       className="flex items-center justify-center gap-1 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 px-2"
-                      disabled={loading}
+                      disabled={loading || wouldGoIntoFuture('next')}
                     >
                       <ChevronRight className="h-4 w-4" />
                     </Button>
