@@ -119,9 +119,8 @@ export default function PodcastPage() {
       <CardContent className="px-4 py-3">
         <div className="flex items-start gap-4 animate-pulse">
           {/* Score Badge Skeleton */}
-          <div className="flex-shrink-0 flex flex-col items-center gap-2">
+          <div className="flex-shrink-0">
             <div className="w-[50px] h-[44px] bg-gray-800 rounded-lg"></div>
-            <div className="w-8 h-8 bg-gray-800 rounded"></div>
           </div>
 
           {/* Episode Info Skeleton */}
@@ -233,15 +232,12 @@ export default function PodcastPage() {
                 <Card key={episode.id} className="border-gray-800 bg-gray-900 hover:bg-gray-800/50 transition-colors">
                   <CardContent className="px-4 py-3">
                     <div className="flex items-start gap-4">
-                      {/* Score Badge and Podcast Icon */}
-                      <div className="flex-shrink-0 flex flex-col items-center gap-2">
+                      {/* Score Badge */}
+                      <div className="flex-shrink-0">
                         <div className="px-2 py-1.5 bg-green-900/30 border border-green-700/50 rounded-lg flex flex-col items-center min-w-[50px]">
                           <span className="text-green-300 text-xs leading-none">Score</span>
                           <span className="font-medium text-green-400 text-sm leading-none mt-0.5">{getDisplayScore(episode.score)}</span>
                         </div>
-                        
-                        {/* Podcast Page Link - Hidden since we're already on podcast page */}
-                        <div className="w-8 h-8"></div>
                       </div>
 
                       {/* Episode Info */}

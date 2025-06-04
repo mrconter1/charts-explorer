@@ -179,9 +179,8 @@ export default function PodcastDashboard() {
       <CardContent className="px-4 py-3">
         <div className="flex items-start gap-4 animate-pulse">
           {/* Score Badge Skeleton */}
-          <div className="flex-shrink-0 flex flex-col items-center gap-2">
+          <div className="flex-shrink-0">
             <div className="w-[50px] h-[44px] bg-gray-800 rounded-lg"></div>
-            <div className="w-8 h-8 bg-gray-800 rounded"></div>
           </div>
 
           {/* Episode Info Skeleton */}
@@ -429,23 +428,12 @@ export default function PodcastDashboard() {
                 <Card key={episode.id} className="border-gray-800 bg-gray-900 hover:bg-gray-800/50 transition-colors">
                   <CardContent className="px-4 py-3">
                     <div className="flex items-start gap-4">
-                      {/* Score Badge and Podcast Icon */}
-                      <div className="flex-shrink-0 flex flex-col items-center gap-2">
+                      {/* Score Badge */}
+                      <div className="flex-shrink-0">
                         <div className="px-2 py-1.5 bg-green-900/30 border border-green-700/50 rounded-lg flex flex-col items-center min-w-[50px]">
                           <span className="text-green-300 text-xs leading-none">Score</span>
                           <span className="font-medium text-green-400 text-sm leading-none mt-0.5">{getDisplayScore(episode.score)}</span>
                         </div>
-                        
-                        {/* Podcast Page Link */}
-                        <Link href={`/podcast/${encodeURIComponent(episode.show_uri)}`}>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="w-8 h-8 p-0 hover:bg-gray-700 text-gray-400 hover:text-blue-400 transition-colors"
-                          >
-                            <Podcast className="h-4 w-4" />
-                          </Button>
-                        </Link>
                       </div>
 
                       {/* Episode Info */}
@@ -455,7 +443,13 @@ export default function PodcastDashboard() {
                         </h3>
                         <div className="space-y-1">
                           <div className="text-sm text-gray-400">
-                            <span className="font-medium">{episode.show_name}</span>
+                            <Link 
+                              href={`/podcast/${encodeURIComponent(episode.show_uri)}`}
+                              className="font-medium hover:text-blue-400 transition-colors cursor-pointer flex items-center gap-1"
+                            >
+                              <span>{episode.show_name}</span>
+                              <ArrowRight className="h-3 w-3" />
+                            </Link>
                           </div>
                           <div className="text-xs text-gray-500">
                             {formatDate(episode.first_appearance_date)}
