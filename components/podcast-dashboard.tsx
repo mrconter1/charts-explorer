@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3, Loader2, ExternalLink, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3, Loader2, ExternalLink, Play, ArrowRight, Podcast } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -233,14 +233,9 @@ export default function PodcastDashboard() {
 
         {/* Episodes List */}
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-100">
-              🏆 Top Episodes
-            </h2>
-            <p className="text-sm text-gray-400">
-              Click podcast names to view all episodes
-            </p>
-          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-100">
+            🏆 Top Episodes
+          </h2>
           
           {loading ? (
             <Card className="border-gray-800 bg-gray-900">
@@ -273,44 +268,50 @@ export default function PodcastDashboard() {
             <div className="space-y-2 pb-8">
               {episodes.map((episode, index) => (
                 <Card key={episode.id} className="border-gray-800 bg-gray-900 hover:bg-gray-800/50 transition-colors">
-                  <CardContent className="px-4 py-2">
-                    <div className="flex items-center gap-4">
-                      {/* Score Badge */}
-                      <div className="flex-shrink-0">
-                        <div className="px-3 py-2 bg-green-900/30 border border-green-700/50 rounded-lg flex flex-col items-center">
+                  <CardContent className="px-4 py-3">
+                    <div className="flex items-start gap-4">
+                      {/* Score Badge and Podcast Icon */}
+                      <div className="flex-shrink-0 flex flex-col items-center gap-2">
+                        <div className="px-2 py-1.5 bg-green-900/30 border border-green-700/50 rounded-lg flex flex-col items-center min-w-[50px]">
                           <span className="text-green-300 text-xs leading-none">Score</span>
-                          <span className="font-medium text-green-400 text-sm leading-none">{getDisplayScore(episode.score)}</span>
+                          <span className="font-medium text-green-400 text-sm leading-none mt-0.5">{getDisplayScore(episode.score)}</span>
                         </div>
+                        
+                        {/* Podcast Page Link */}
+                        <Link href={`/podcast/${encodeURIComponent(episode.show_uri)}`}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="w-8 h-8 p-0 hover:bg-gray-700 text-gray-400 hover:text-blue-400 transition-colors"
+                          >
+                            <Podcast className="h-4 w-4" />
+                          </Button>
+                        </Link>
                       </div>
 
                       {/* Episode Info */}
                       <div className="flex-grow min-w-0">
-                        <h3 className="font-semibold text-base text-gray-100 leading-tight mb-1">
+                        <h3 className="font-semibold text-base text-gray-100 leading-tight mb-2">
                           {episode.episode_name}
                         </h3>
                         <div className="space-y-1">
                           <div className="text-sm text-gray-400">
-                            <Link 
-                              href={`/podcast/${encodeURIComponent(episode.show_uri)}`}
-                              className="font-medium hover:text-blue-400 hover:underline transition-colors cursor-pointer"
-                            >
-                              {episode.show_name}
-                            </Link>
+                            <span className="font-medium">{episode.show_name}</span>
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-xs text-gray-500">
                             {formatDate(episode.first_appearance_date)}
                           </div>
                         </div>
                       </div>
 
                       {/* Play Button */}
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 flex items-center">
                         <Button
                           size="sm"
                           onClick={() => window.open(getSpotifyUrl(episode.episode_uri), '_blank')}
-                          className="w-10 h-10 rounded-full !bg-green-600 hover:!bg-green-500 !border-green-600 hover:!border-green-500 !text-white hover:!text-white p-0 flex items-center justify-center"
+                          className="w-8 h-8 rounded-full !bg-green-600 hover:!bg-green-500 !border-green-600 hover:!border-green-500 !text-white hover:!text-white p-0 flex items-center justify-center"
                         >
-                          <Play className="h-4 w-4 fill-current" />
+                          <Play className="h-3 w-3 fill-current" />
                         </Button>
                       </div>
                     </div>
