@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
 import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3, Loader2, ExternalLink, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -232,9 +233,14 @@ export default function PodcastDashboard() {
 
         {/* Episodes List */}
         <div className="space-y-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-100">
-            🏆 Top Episodes
-          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-100">
+              🏆 Top Episodes
+            </h2>
+            <p className="text-sm text-gray-400">
+              Click podcast names to view all episodes
+            </p>
+          </div>
           
           {loading ? (
             <Card className="border-gray-800 bg-gray-900">
@@ -284,7 +290,12 @@ export default function PodcastDashboard() {
                         </h3>
                         <div className="space-y-1">
                           <div className="text-sm text-gray-400">
-                            <span className="font-medium">{episode.show_name}</span>
+                            <Link 
+                              href={`/podcast/${encodeURIComponent(episode.show_uri)}`}
+                              className="font-medium hover:text-blue-400 hover:underline transition-colors cursor-pointer"
+                            >
+                              {episode.show_name}
+                            </Link>
                           </div>
                           <div className="text-sm text-gray-500">
                             {formatDate(episode.first_appearance_date)}
