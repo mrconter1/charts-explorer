@@ -113,13 +113,53 @@ export default function PodcastPage() {
     return showUri;
   };
 
+  // Skeleton loading component for episode tiles
+  const EpisodeSkeleton = () => (
+    <Card className="border-gray-800 bg-gray-900">
+      <CardContent className="px-4 py-3">
+        <div className="flex items-start gap-4 animate-pulse">
+          {/* Score Badge Skeleton */}
+          <div className="flex-shrink-0 flex flex-col items-center gap-2">
+            <div className="w-[50px] h-[44px] bg-gray-800 rounded-lg"></div>
+            <div className="w-8 h-8 bg-gray-800 rounded"></div>
+          </div>
+
+          {/* Episode Info Skeleton */}
+          <div className="flex-grow min-w-0 space-y-2">
+            <div className="h-5 bg-gray-800 rounded w-3/4"></div>
+            <div className="space-y-1">
+              <div className="h-4 bg-gray-800 rounded w-1/2"></div>
+              <div className="h-3 bg-gray-800 rounded w-1/3"></div>
+            </div>
+          </div>
+
+          {/* Play Button Skeleton */}
+          <div className="flex-shrink-0 flex items-center">
+            <div className="w-10 h-10 bg-gray-800 rounded-full"></div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-950 text-gray-100">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <div className="text-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-400" />
-            <p className="text-gray-400">Loading podcast...</p>
+          {/* Loading Header */}
+          <div className="text-center space-y-4 mb-8">
+            <div className="h-12 bg-gray-800 rounded w-2/3 mx-auto animate-pulse"></div>
+            <div className="h-6 bg-gray-800 rounded w-3/4 mx-auto animate-pulse"></div>
+          </div>
+          
+          {/* Episodes List Loading */}
+          <div className="space-y-4">
+            <div className="h-8 bg-gray-800 rounded w-48 animate-pulse"></div>
+            <div className="space-y-2 pb-8">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <EpisodeSkeleton key={index} />
+              ))}
+            </div>
           </div>
         </div>
       </div>

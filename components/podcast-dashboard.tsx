@@ -173,6 +173,35 @@ export default function PodcastDashboard() {
       .slice(0, 10); // Limit to 10 results
   }, [searchTerm, allEpisodes]);
 
+  // Skeleton loading component for episode tiles
+  const EpisodeSkeleton = () => (
+    <Card className="border-gray-800 bg-gray-900">
+      <CardContent className="px-4 py-3">
+        <div className="flex items-start gap-4 animate-pulse">
+          {/* Score Badge Skeleton */}
+          <div className="flex-shrink-0 flex flex-col items-center gap-2">
+            <div className="w-[50px] h-[44px] bg-gray-800 rounded-lg"></div>
+            <div className="w-8 h-8 bg-gray-800 rounded"></div>
+          </div>
+
+          {/* Episode Info Skeleton */}
+          <div className="flex-grow min-w-0 space-y-2">
+            <div className="h-5 bg-gray-800 rounded w-3/4"></div>
+            <div className="space-y-1">
+              <div className="h-4 bg-gray-800 rounded w-1/2"></div>
+              <div className="h-3 bg-gray-800 rounded w-1/3"></div>
+            </div>
+          </div>
+
+          {/* Play Button Skeleton */}
+          <div className="flex-shrink-0 flex items-center">
+            <div className="w-10 h-10 bg-gray-800 rounded-full"></div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   // Show loading state during hydration
   if (!mounted) {
     return (
@@ -369,12 +398,11 @@ export default function PodcastDashboard() {
           </h2>
           
           {loading ? (
-            <Card className="border-gray-800 bg-gray-900">
-              <CardContent className="text-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-400" />
-                <p className="text-gray-400">Loading episodes...</p>
-              </CardContent>
-            </Card>
+            <div className="space-y-2 pb-8">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <EpisodeSkeleton key={index} />
+              ))}
+            </div>
           ) : error ? (
             <Card className="border-gray-800 bg-gray-900">
               <CardContent className="text-center py-12">
