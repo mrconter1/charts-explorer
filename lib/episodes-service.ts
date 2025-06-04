@@ -84,4 +84,34 @@ export async function getEpisodeCount({
     console.error('Error in getEpisodeCount:', error);
     return 0;
   }
+}
+
+// Get global min and max scores for consistent score transformation
+export async function getGlobalScoreRange(): Promise<{ minScore: number; maxScore: number }> {
+  try {
+    // Get min and max scores in a single query using aggregate functions
+    const { data, error } = await supabase
+      .from('episodes')
+      .select('score')
+      .order('score', { ascending: true })
+      .limit(1000000); // Get all scores to calculate min/max
+
+    if (error) {
+      console.error('Error fetching score range:', error);
+      return { minScore: 1, maxScore: 1000 }; // Fallback values
+    }
+
+    if (!data || data.length === 0) {
+      return { minScore: 1, maxScore: 1000 }; // Fallback values
+    }
+
+    const scores = data.map(episode => episode.score);
+    const minScore = Math.min(...scores);
+    const maxScore = Math.max(...scores);
+
+    return { minScore, maxScore };
+  } catch (error) {
+    console.error('Error in getGlobalScoreRange:', error);
+    return { minScore: 1, maxScore: 1000 }; // Fallback values
+  }
 } 

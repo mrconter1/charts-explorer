@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Episode, Region, TimeWindow } from '@/types/podcast';
-import { fetchTopEpisodes } from '@/lib/episodes-service';
+import { fetchTopEpisodes, getGlobalScoreRange } from '@/lib/episodes-service';
 import { getDateRange, navigateTimeWindow, formatDateRange, getTimeWindowLabel } from '@/lib/date-utils';
 
 export default function PodcastDashboard() {
@@ -19,12 +19,31 @@ export default function PodcastDashboard() {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [scoreRange, setScoreRange] = useState<{ minScore: number; maxScore: number } | null>(null);
 
   // Set actual current date after component mounts
   useEffect(() => {
     setMounted(true);
     setCurrentDate(new Date());
   }, []);
+
+  // Fetch global score range once when component mounts
+  useEffect(() => {
+    const loadScoreRange = async () => {
+      try {
+        const range = await getGlobalScoreRange();
+        setScoreRange(range);
+      } catch (err) {
+        console.error('Failed to fetch score range:', err);
+        // Use fallback values
+        setScoreRange({ minScore: 1, maxScore: 1000 });
+      }
+    };
+
+    if (mounted) {
+      loadScoreRange();
+    }
+  }, [mounted]);
 
   // Fetch episodes when filters change
   useEffect(() => {
@@ -79,6 +98,17 @@ export default function PodcastDashboard() {
     // Convert "spotify:episode:1234" to "https://open.spotify.com/episode/1234"
     const episodeId = episodeUri.replace('spotify:episode:', '');
     return `https://open.spotify.com/episode/${episodeId}`;
+  };
+
+  // Transform raw score to display score (higher = better)
+  const getDisplayScore = (rawScore: number): number => {
+    if (!scoreRange) return 0;
+    
+    const { maxScore } = scoreRange;
+    
+    // Simple inversion: higher display scores = better performance
+    const displayScore = maxScore - rawScore;
+    return Math.max(0, displayScore);
   };
 
   // Show loading state during hydration
@@ -230,10 +260,11 @@ export default function PodcastDashboard() {
                 <Card key={episode.id} className="border-gray-800 bg-gray-900 hover:bg-gray-800/50 transition-colors">
                   <CardContent className="px-4 py-2">
                     <div className="flex items-center gap-4">
-                      {/* Rank */}
+                      {/* Score Badge */}
                       <div className="flex-shrink-0">
-                        <div className="min-w-[32px] h-6 bg-gray-800 border border-gray-700 rounded-md flex items-center justify-center font-medium text-gray-300 text-sm">
-                          {index + 1}
+                        <div className="px-3 py-2 bg-green-900/30 border border-green-700/50 rounded-lg flex flex-col items-center">
+                          <span className="text-green-300 text-xs leading-none">Score</span>
+                          <span className="font-medium text-green-400 text-sm leading-none">{getDisplayScore(episode.score)}</span>
                         </div>
                       </div>
 
