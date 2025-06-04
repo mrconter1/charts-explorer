@@ -232,7 +232,7 @@ export default function PodcastDashboard() {
                     <div className="flex items-center gap-4">
                       {/* Rank */}
                       <div className="flex-shrink-0">
-                        <div className="w-7 h-7 bg-gray-700 rounded-full flex items-center justify-center font-bold text-gray-200 text-xs">
+                        <div className="min-w-[32px] h-6 bg-gray-800 border border-gray-700 rounded-md flex items-center justify-center font-medium text-gray-300 text-sm">
                           {index + 1}
                         </div>
                       </div>
