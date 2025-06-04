@@ -39,7 +39,7 @@ export default function PodcastDashboard() {
           region,
           timeWindow,
           currentDate,
-          limit: 25
+          limit: 50
         });
         setEpisodes(data);
       } catch (err) {
