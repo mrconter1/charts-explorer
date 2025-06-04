@@ -112,48 +112,51 @@ export default function PodcastDashboard() {
         {/* Controls */}
         <Card className="border-gray-800 bg-gray-900 mb-6">
           <CardContent className="px-6 py-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Region Selection */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2 text-gray-300">
-                  <Globe className="h-4 w-4 text-cyan-400" />
-                  Region
-                </label>
-                <Select value={region} onValueChange={(value: Region) => setRegion(value)}>
-                  <SelectTrigger className="w-full border-gray-700 bg-gray-800 text-gray-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="border-gray-700 bg-gray-800">
-                    <SelectItem value="se" className="text-gray-200 focus:bg-gray-700">🇸🇪 Sweden</SelectItem>
-                    <SelectItem value="us" className="text-gray-200 focus:bg-gray-700">🇺🇸 United States</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className="space-y-4">
+              {/* Region and Time Window - Always on Same Row */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                {/* Region Selection */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2 text-gray-300">
+                    <Globe className="h-4 w-4 text-cyan-400" />
+                    Region
+                  </label>
+                  <Select value={region} onValueChange={(value: Region) => setRegion(value)}>
+                    <SelectTrigger className="w-full border-gray-700 bg-gray-800 text-gray-200">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="border-gray-700 bg-gray-800">
+                      <SelectItem value="se" className="text-gray-200 focus:bg-gray-700">🇸🇪 Sweden</SelectItem>
+                      <SelectItem value="us" className="text-gray-200 focus:bg-gray-700">🇺🇸 United States</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Time Window Selection */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2 text-gray-300">
+                    <Calendar className="h-4 w-4 text-purple-400" />
+                    Time Window
+                  </label>
+                  <Select 
+                    value={timeWindow} 
+                    onValueChange={(value: TimeWindow) => handleTimeWindowChange(value)}
+                  >
+                    <SelectTrigger className="w-full border-gray-700 bg-gray-800 text-gray-200">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="border-gray-700 bg-gray-800">
+                      <SelectItem value="week" className="text-gray-200 focus:bg-gray-700">Week</SelectItem>
+                      <SelectItem value="month" className="text-gray-200 focus:bg-gray-700">Month</SelectItem>
+                      <SelectItem value="quarter" className="text-gray-200 focus:bg-gray-700">Quarter</SelectItem>
+                      <SelectItem value="year" className="text-gray-200 focus:bg-gray-700">Year</SelectItem>
+                      <SelectItem value="all" className="text-gray-200 focus:bg-gray-700">All Time</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
-              {/* Time Window Selection */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2 text-gray-300">
-                  <Calendar className="h-4 w-4 text-purple-400" />
-                  Time Window
-                </label>
-                <Select 
-                  value={timeWindow} 
-                  onValueChange={(value: TimeWindow) => handleTimeWindowChange(value)}
-                >
-                  <SelectTrigger className="w-full border-gray-700 bg-gray-800 text-gray-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="border-gray-700 bg-gray-800">
-                    <SelectItem value="week" className="text-gray-200 focus:bg-gray-700">Week</SelectItem>
-                    <SelectItem value="month" className="text-gray-200 focus:bg-gray-700">Month</SelectItem>
-                    <SelectItem value="quarter" className="text-gray-200 focus:bg-gray-700">Quarter</SelectItem>
-                    <SelectItem value="year" className="text-gray-200 focus:bg-gray-700">Year</SelectItem>
-                    <SelectItem value="all" className="text-gray-200 focus:bg-gray-700">All Time</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Time Navigation - Single Row */}
+              {/* Time Navigation - Separate Row */}
               {timeWindow !== 'all' && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-300">Date Range</label>
