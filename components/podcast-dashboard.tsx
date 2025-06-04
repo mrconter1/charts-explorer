@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3, Loader2, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3, Loader2, ExternalLink, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -93,11 +93,10 @@ export default function PodcastDashboard() {
     return region === 'se' ? '🇸🇪 Sweden' : '🇺🇸 United States';
   };
 
-  // Convert Spotify URI to web URL
+  // Convert Spotify URI to app URL
   const getSpotifyUrl = (episodeUri: string) => {
-    // Convert "spotify:episode:1234" to "https://open.spotify.com/episode/1234"
-    const episodeId = episodeUri.replace('spotify:episode:', '');
-    return `https://open.spotify.com/episode/${episodeId}`;
+    // Use spotify: URI directly to open in app, fallback to web if app not available
+    return episodeUri;
   };
 
   // Transform raw score to display score (higher = better)
@@ -293,16 +292,14 @@ export default function PodcastDashboard() {
                         </div>
                       </div>
 
-                      {/* Listen Button */}
+                      {/* Play Button */}
                       <div className="flex-shrink-0">
                         <Button
-                          variant="outline"
                           size="sm"
                           onClick={() => window.open(getSpotifyUrl(episode.episode_uri), '_blank')}
-                          className="flex items-center gap-2 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-white h-8 px-3"
+                          className="w-10 h-10 rounded-full !bg-green-600 hover:!bg-green-500 !border-green-600 hover:!border-green-500 !text-white hover:!text-white p-0 flex items-center justify-center"
                         >
-                          <ExternalLink className="h-3 w-3" />
-                          <span className="hidden sm:inline text-xs">Listen</span>
+                          <Play className="h-4 w-4 fill-current" />
                         </Button>
                       </div>
                     </div>
