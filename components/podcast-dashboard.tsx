@@ -111,6 +111,16 @@ export default function PodcastDashboard() {
     return Math.max(0, displayScore);
   };
 
+  // Format date in human readable format
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+
   // Show loading state during hydration
   if (!mounted) {
     return (
@@ -273,10 +283,13 @@ export default function PodcastDashboard() {
                         <h3 className="font-semibold text-base text-gray-100 leading-tight mb-1">
                           {episode.episode_name}
                         </h3>
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          <span className="font-medium">{episode.show_name}</span>
-                          <span>•</span>
-                          <span>{new Date(episode.first_appearance_date).toLocaleDateString()}</span>
+                        <div className="space-y-1">
+                          <div className="text-sm text-gray-400">
+                            <span className="font-medium">{episode.show_name}</span>
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {formatDate(episode.first_appearance_date)}
+                          </div>
                         </div>
                       </div>
 
