@@ -14,7 +14,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Charts Explorer",
-  description: "Track the best performing podcast episodes with our golf-style scoring system",
+  description: "Track the best performing podcast episodes with our intuitive scoring system",
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
