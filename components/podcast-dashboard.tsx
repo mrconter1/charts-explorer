@@ -270,7 +270,7 @@ export default function PodcastDashboard() {
 
                       {/* Episode Info */}
                       <div className="flex-grow min-w-0">
-                        <h3 className="font-semibold text-base text-gray-100 leading-tight mb-1 line-clamp-1">
+                        <h3 className="font-semibold text-base text-gray-100 leading-tight mb-1">
                           {episode.episode_name}
                         </h3>
                         <div className="flex items-center gap-2 text-sm text-gray-400">
