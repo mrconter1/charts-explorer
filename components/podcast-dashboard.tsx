@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3, Loader2, ExternalLink, Play, ArrowRight, Podcast } from 'lucide-react';
+import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Globe, BarChart3, Loader2, ExternalLink, Play, ArrowRight, Podcast, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +21,9 @@ export default function PodcastDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [scoreRange, setScoreRange] = useState<{ minScore: number; maxScore: number } | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [allEpisodes, setAllEpisodes] = useState<Episode[]>([]);
 
   // Set actual current date after component mounts
   useEffect(() => {
@@ -62,6 +65,15 @@ export default function PodcastDashboard() {
           limit: 50
         });
         setEpisodes(data);
+        
+        // Also fetch all episodes for search (if not already fetched)
+        if (allEpisodes.length === 0) {
+          const [seAllEpisodes, usAllEpisodes] = await Promise.all([
+            fetchTopEpisodes({ region: 'se', timeWindow: 'all', currentDate: new Date(), limit: 1000 }),
+            fetchTopEpisodes({ region: 'us', timeWindow: 'all', currentDate: new Date(), limit: 1000 })
+          ]);
+          setAllEpisodes([...seAllEpisodes, ...usAllEpisodes]);
+        }
       } catch (err) {
         console.error('Failed to fetch episodes:', err);
         setError('Failed to load episodes. Please try again.');
@@ -120,6 +132,35 @@ export default function PodcastDashboard() {
       day: 'numeric' 
     });
   };
+
+  // Get unique podcasts from all episodes
+  const getUniquePodcasts = () => {
+    const podcastMap = new Map();
+    allEpisodes.forEach(episode => {
+      if (!podcastMap.has(episode.show_uri)) {
+        podcastMap.set(episode.show_uri, {
+          show_uri: episode.show_uri,
+          show_name: episode.show_name,
+          show_description: episode.show_description,
+          episode_count: 1
+        });
+      } else {
+        podcastMap.get(episode.show_uri).episode_count++;
+      }
+    });
+    return Array.from(podcastMap.values());
+  };
+
+  // Filter podcasts based on search term
+  const searchResults = useMemo(() => {
+    if (!searchTerm.trim()) return [];
+    const podcasts = getUniquePodcasts();
+    return podcasts
+      .filter(podcast => 
+        podcast.show_name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .slice(0, 10); // Limit to 10 results
+  }, [searchTerm, allEpisodes]);
 
   // Show loading state during hydration
   if (!mounted) {
@@ -227,6 +268,85 @@ export default function PodcastDashboard() {
                   </div>
                 </div>
               )}
+
+              {/* Search Podcasts */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2 text-gray-300">
+                  <Search className="h-4 w-4 text-cyan-400" />
+                  Search Podcasts
+                </label>
+                <div className="relative">
+                  {!searchOpen ? (
+                    <Button
+                      onClick={() => setSearchOpen(true)}
+                      variant="outline"
+                      className="w-full border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 flex items-center justify-center gap-2"
+                    >
+                      <Search className="h-4 w-4" />
+                      Search for podcasts...
+                    </Button>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <input
+                            type="text"
+                            placeholder="Type podcast name..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full px-4 py-2 pl-10 bg-gray-800 border border-gray-700 rounded-md text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            autoFocus
+                          />
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        </div>
+                        <Button
+                          onClick={() => {
+                            setSearchOpen(false);
+                            setSearchTerm('');
+                          }}
+                          variant="outline"
+                          size="sm"
+                          className="border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 px-3"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      
+                      {/* Search Results */}
+                      {searchResults.length > 0 && (
+                        <div className="bg-gray-800 border border-gray-700 rounded-md max-h-48 overflow-y-auto">
+                          {searchResults.map((podcast) => (
+                            <Link 
+                              key={podcast.show_uri} 
+                              href={`/podcast/${encodeURIComponent(podcast.show_uri)}`}
+                              onClick={() => {
+                                setSearchOpen(false);
+                                setSearchTerm('');
+                              }}
+                            >
+                              <div className="px-3 py-2 hover:bg-gray-700 cursor-pointer border-b border-gray-700 last:border-b-0">
+                                <div className="font-medium text-gray-200 text-sm">{podcast.show_name}</div>
+                                <div className="text-xs text-gray-400">
+                                  {podcast.episode_count} episode{podcast.episode_count !== 1 ? 's' : ''}
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* No Results */}
+                      {searchTerm.trim() && searchResults.length === 0 && (
+                        <div className="bg-gray-800 border border-gray-700 rounded-md px-3 py-2">
+                          <div className="text-gray-400 text-sm text-center">
+                            No podcasts found for "{searchTerm}"
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
