@@ -27,9 +27,20 @@ export async function fetchTopEpisodes({
     if (timeWindow !== 'all') {
       const { startDate, endDate } = getDateRange(timeWindow, currentDate);
       
+      // Check if the time window includes current date (within last 24 hours)
+      const now = new Date();
+      const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      
+      let actualEndDate = endDate;
+      
+      // If the end date is within 24 hours of now, adjust it to exclude recent episodes
+      if (endDate >= twentyFourHoursAgo) {
+        actualEndDate = twentyFourHoursAgo;
+      }
+      
       // Format dates for Supabase (YYYY-MM-DD)
       const startDateStr = startDate.toISOString().split('T')[0];
-      const endDateStr = endDate.toISOString().split('T')[0];
+      const endDateStr = actualEndDate.toISOString().split('T')[0];
       
       query = query
         .gte('first_appearance_date', startDateStr)
