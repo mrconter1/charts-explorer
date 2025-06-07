@@ -7,7 +7,7 @@ import { ChevronLeft, BarChart3, Loader2, Play, ExternalLink } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Episode } from '@/types/podcast';
-import { fetchTopEpisodes, getGlobalScoreRange } from '@/lib/episodes-service';
+import { fetchTopEpisodes } from '@/lib/episodes-service';
 
 export default function PodcastPage() {
   const params = useParams();
@@ -17,22 +17,7 @@ export default function PodcastPage() {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [scoreRange, setScoreRange] = useState<{ minScore: number; maxScore: number } | null>(null);
   const [podcastInfo, setPodcastInfo] = useState<{ name: string; description: string } | null>(null);
-
-  // Fetch global score range
-  useEffect(() => {
-    const loadScoreRange = async () => {
-      try {
-        const range = await getGlobalScoreRange();
-        setScoreRange(range);
-      } catch (err) {
-        console.error('Failed to fetch score range:', err);
-        setScoreRange({ minScore: 1, maxScore: 1000 });
-      }
-    };
-    loadScoreRange();
-  }, []);
 
   // Fetch episodes for this specific podcast
   useEffect(() => {
@@ -41,31 +26,18 @@ export default function PodcastPage() {
       setError(null);
       
       try {
-        // Get all episodes from both regions for this podcast
         const [seEpisodes, usEpisodes] = await Promise.all([
-          fetchTopEpisodes({
-            region: 'se',
-            timeWindow: 'all',
-            currentDate: new Date(),
-            limit: 1000
-          }),
-          fetchTopEpisodes({
-            region: 'us', 
-            timeWindow: 'all',
-            currentDate: new Date(),
-            limit: 1000
-          })
+          fetchTopEpisodes({ region: 'se', timeWindow: 'all', currentDate: new Date(), limit: 1000 }),
+          fetchTopEpisodes({ region: 'us', timeWindow: 'all', currentDate: new Date(), limit: 1000 })
         ]);
-
-        // Combine and filter by show URI
+        
         const allEpisodes = [...seEpisodes, ...usEpisodes];
         const podcastEpisodes = allEpisodes
           .filter(episode => episode.show_uri === showUri)
-          .sort((a, b) => a.score - b.score); // Sort by score (lower = better)
+          .sort((a, b) => b.score - a.score); // Sort by score (higher = better)
 
         setEpisodes(podcastEpisodes);
-
-        // Set podcast info from first episode
+        
         if (podcastEpisodes.length > 0) {
           setPodcastInfo({
             name: podcastEpisodes[0].show_name,
@@ -85,12 +57,11 @@ export default function PodcastPage() {
     }
   }, [showUri]);
 
-  // Transform raw score to display score
+  // Transform raw score to display score (higher = better)
   const getDisplayScore = (rawScore: number): number => {
-    if (!scoreRange) return 0;
-    const { maxScore } = scoreRange;
-    const displayScore = maxScore - rawScore;
-    return Math.max(0, displayScore);
+    // New scoring system: higher database scores = better rankings
+    // No inversion needed anymore
+    return rawScore;
   };
 
   // Format date in human readable format

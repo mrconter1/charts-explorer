@@ -7,6 +7,8 @@ export interface Episode {
   episode_uri: string;
   show_uri: string;
   show_description: string;
+  episode_description?: string | null;
+  episode_duration?: string | null;
   region: 'se' | 'us';
   created_at: string;
   updated_at: string;

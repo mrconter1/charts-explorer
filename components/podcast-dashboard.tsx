@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Episode, Region, TimeWindow } from '@/types/podcast';
-import { fetchTopEpisodes, getGlobalScoreRange } from '@/lib/episodes-service';
+import { fetchTopEpisodes } from '@/lib/episodes-service';
 import { getDateRange, navigateTimeWindow, formatDateRange, getTimeWindowLabel } from '@/lib/date-utils';
 
 export default function PodcastDashboard() {
@@ -20,7 +20,6 @@ export default function PodcastDashboard() {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [scoreRange, setScoreRange] = useState<{ minScore: number; maxScore: number } | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [allEpisodes, setAllEpisodes] = useState<Episode[]>([]);
@@ -30,24 +29,6 @@ export default function PodcastDashboard() {
     setMounted(true);
     setCurrentDate(new Date());
   }, []);
-
-  // Fetch global score range once when component mounts
-  useEffect(() => {
-    const loadScoreRange = async () => {
-      try {
-        const range = await getGlobalScoreRange();
-        setScoreRange(range);
-      } catch (err) {
-        console.error('Failed to fetch score range:', err);
-        // Use fallback values
-        setScoreRange({ minScore: 1, maxScore: 1000 });
-      }
-    };
-
-    if (mounted) {
-      loadScoreRange();
-    }
-  }, [mounted]);
 
   // Fetch episodes when filters change
   useEffect(() => {
@@ -131,13 +112,9 @@ export default function PodcastDashboard() {
 
   // Transform raw score to display score (higher = better)
   const getDisplayScore = (rawScore: number): number => {
-    if (!scoreRange) return 0;
-    
-    const { maxScore } = scoreRange;
-    
-    // Simple inversion: higher display scores = better performance
-    const displayScore = maxScore - rawScore;
-    return Math.max(0, displayScore);
+    // New scoring system: higher database scores = better rankings
+    // No inversion needed anymore
+    return rawScore;
   };
 
   // Format date in human readable format
