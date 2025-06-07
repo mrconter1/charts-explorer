@@ -1,28 +1,52 @@
 import { TimeWindow } from '@/types/podcast';
+import { 
+  getWeek, 
+  getYear, 
+  startOfWeek, 
+  endOfWeek, 
+  startOfMonth, 
+  endOfMonth, 
+  startOfQuarter, 
+  endOfQuarter, 
+  startOfYear, 
+  endOfYear,
+  addWeeks,
+  addMonths,
+  addQuarters,
+  addYears,
+  format
+} from 'date-fns';
+
+
 
 export const getDateRange = (timeWindow: TimeWindow, currentDate: Date = new Date()): { startDate: Date; endDate: Date } => {
-  const endDate = new Date(currentDate);
-  const startDate = new Date(currentDate);
-
   switch (timeWindow) {
-    case 'week':
-      startDate.setDate(currentDate.getDate() - 7);
-      break;
-    case 'month':
-      startDate.setMonth(currentDate.getMonth() - 1);
-      break;
-    case 'quarter':
-      startDate.setMonth(currentDate.getMonth() - 3);
-      break;
-    case 'year':
-      startDate.setFullYear(currentDate.getFullYear() - 1);
-      break;
-    case 'all':
-      startDate.setFullYear(2020); // Set to a very early date for "all" data
-      break;
+    case 'week': {
+      const startDate = startOfWeek(currentDate, { weekStartsOn: 1 }); // Monday
+      const endDate = endOfWeek(currentDate, { weekStartsOn: 1 }); // Sunday
+      return { startDate, endDate };
+    }
+    case 'month': {
+      const startDate = startOfMonth(currentDate);
+      const endDate = endOfMonth(currentDate);
+      return { startDate, endDate };
+    }
+    case 'quarter': {
+      const startDate = startOfQuarter(currentDate);
+      const endDate = endOfQuarter(currentDate);
+      return { startDate, endDate };
+    }
+    case 'year': {
+      const startDate = startOfYear(currentDate);
+      const endDate = endOfYear(currentDate);
+      return { startDate, endDate };
+    }
+    case 'all': {
+      const startDate = new Date(2020, 0, 1); // Set to a very early date for "all" data
+      const endDate = new Date();
+      return { startDate, endDate };
+    }
   }
-
-  return { startDate, endDate };
 };
 
 export const navigateTimeWindow = (
@@ -30,45 +54,58 @@ export const navigateTimeWindow = (
   timeWindow: TimeWindow,
   direction: 'prev' | 'next'
 ): Date => {
-  const newDate = new Date(currentDate);
   const multiplier = direction === 'prev' ? -1 : 1;
 
   switch (timeWindow) {
-    case 'week':
-      newDate.setDate(currentDate.getDate() + (7 * multiplier));
-      break;
-    case 'month':
-      newDate.setMonth(currentDate.getMonth() + multiplier);
-      break;
-    case 'quarter':
-      newDate.setMonth(currentDate.getMonth() + (3 * multiplier));
-      break;
-    case 'year':
-      newDate.setFullYear(currentDate.getFullYear() + multiplier);
-      break;
-    case 'all':
+    case 'week': {
+      return addWeeks(currentDate, multiplier);
+    }
+    case 'month': {
+      return addMonths(currentDate, multiplier);
+    }
+    case 'quarter': {
+      return addQuarters(currentDate, multiplier);
+    }
+    case 'year': {
+      return addYears(currentDate, multiplier);
+    }
+    case 'all': {
       // For "all", we don't navigate
       return currentDate;
+    }
   }
-
-  return newDate;
 };
 
-export const formatDateRange = (startDate: Date, endDate: Date, timeWindow: TimeWindow): string => {
+export const formatDateRange = (startDate: Date, endDate: Date, timeWindow: TimeWindow, originalDate?: Date): string => {
   if (timeWindow === 'all') {
     return 'All Time';
   }
 
-  const options: Intl.DateTimeFormatOptions = { 
-    month: 'short', 
-    day: 'numeric',
-    year: timeWindow === 'year' ? 'numeric' : undefined
-  };
-
-  const start = startDate.toLocaleDateString('en-US', options);
-  const end = endDate.toLocaleDateString('en-US', options);
-
-  return `${start} - ${end}`;
+  switch (timeWindow) {
+    case 'week': {
+      // Use the original date to calculate week number
+      const referenceDate = originalDate || endDate;
+      const weekNumber = getWeek(referenceDate, { weekStartsOn: 1 });
+      const year = getYear(referenceDate);
+      return `Week ${weekNumber}, ${year}`;
+    }
+    case 'month': {
+      return format(startDate, 'MMMM yyyy');
+    }
+    case 'quarter': {
+      const quarter = Math.floor(startDate.getMonth() / 3) + 1;
+      const year = getYear(startDate);
+      return `Q${quarter} ${year}`;
+    }
+    case 'year': {
+      return getYear(startDate).toString();
+    }
+    default: {
+      const start = format(startDate, 'MMM d, yyyy');
+      const end = format(endDate, 'MMM d, yyyy');
+      return `${start} - ${end}`;
+    }
+  }
 };
 
 export const getTimeWindowLabel = (timeWindow: TimeWindow): string => {

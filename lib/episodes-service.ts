@@ -31,6 +31,8 @@ export async function fetchTopEpisodes({
       const startDateStr = startDate.toISOString().split('T')[0];
       const endDateStr = endDate.toISOString().split('T')[0];
       
+      console.log(`Fetching episodes for ${timeWindow} from ${startDateStr} to ${endDateStr}`);
+      
       query = query
         .gte('first_appearance_date', startDateStr)
         .lte('first_appearance_date', endDateStr);

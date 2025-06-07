@@ -93,7 +93,7 @@ export default function PodcastDashboard() {
   };
 
   const { startDate, endDate } = getDateRange(timeWindow, currentDate);
-  const dateRangeText = formatDateRange(startDate, endDate, timeWindow);
+  const dateRangeText = formatDateRange(startDate, endDate, timeWindow, currentDate);
 
   const getRegionLabel = (region: Region) => {
     return region === 'se' ? '🇸🇪 Sweden' : '🇺🇸 United States';
