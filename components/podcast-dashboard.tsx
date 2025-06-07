@@ -428,8 +428,13 @@ export default function PodcastDashboard() {
                 <Card key={episode.id} className="border-gray-800 bg-gray-900 hover:bg-gray-800/50 transition-colors">
                   <CardContent className="px-4 py-4">
                     <div className="flex items-start gap-4">
-                      {/* Score Badge */}
-                      <div className="flex-shrink-0">
+                      {/* Position & Score Badge */}
+                      <div className="flex-shrink-0 space-y-2">
+                        {/* Position Number */}
+                        <div className="px-2 py-1 bg-gray-800/50 border border-gray-700/50 rounded flex items-center justify-center min-w-[50px]">
+                          <span className="font-medium text-gray-300 text-sm">{index + 1}</span>
+                        </div>
+                        {/* Score Badge */}
                         <div className="px-2 py-1.5 bg-green-900/30 border border-green-700/50 rounded-lg flex flex-col items-center min-w-[50px]">
                           <span className="text-green-300 text-xs leading-none">Score</span>
                           <span className="font-medium text-green-400 text-sm leading-none mt-0.5">{getDisplayScore(episode.score)}</span>
