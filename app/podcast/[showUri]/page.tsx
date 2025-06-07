@@ -18,6 +18,7 @@ export default function PodcastPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [podcastInfo, setPodcastInfo] = useState<{ name: string; description: string } | null>(null);
+  const [expandedEpisodes, setExpandedEpisodes] = useState<Set<number>>(new Set());
 
   // Fetch episodes for this specific podcast
   useEffect(() => {
@@ -72,6 +73,22 @@ export default function PodcastPage() {
       month: 'short', 
       day: 'numeric' 
     });
+  };
+
+  // Truncate description and handle expand/collapse
+  const truncateDescription = (description: string, charLimit: number = 150): string => {
+    if (description.length <= charLimit) return description;
+    return description.slice(0, charLimit) + '...';
+  };
+
+  const toggleExpanded = (episodeId: number) => {
+    const newExpanded = new Set(expandedEpisodes);
+    if (newExpanded.has(episodeId)) {
+      newExpanded.delete(episodeId);
+    } else {
+      newExpanded.add(episodeId);
+    }
+    setExpandedEpisodes(newExpanded);
   };
 
   // Convert Spotify URI to app URL
@@ -201,7 +218,7 @@ export default function PodcastPage() {
             <div className="space-y-2 pb-8">
               {episodes.map((episode, index) => (
                 <Card key={episode.id} className="border-gray-800 bg-gray-900 hover:bg-gray-800/50 transition-colors">
-                  <CardContent className="px-4 py-3">
+                  <CardContent className="px-4 py-4">
                     <div className="flex items-start gap-4">
                       {/* Score Badge */}
                       <div className="flex-shrink-0">
@@ -213,21 +230,46 @@ export default function PodcastPage() {
 
                       {/* Episode Info */}
                       <div className="flex-grow min-w-0">
-                        <h3 className="font-semibold text-base text-gray-100 leading-tight mb-2">
-                          {episode.episode_name}
-                        </h3>
-                        <div className="space-y-1">
-                          <div className="text-sm text-gray-400 flex items-center gap-2">
-                            <span className="font-medium">{episode.region === 'se' ? '🇸🇪 Sweden' : '🇺🇸 United States'}</span>
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {formatDate(episode.first_appearance_date)}
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-grow min-w-0">
+                            <h3 className="font-semibold text-base text-gray-100 leading-tight mb-2">
+                              {episode.episode_name}
+                            </h3>
+                            <div className="space-y-1.5">
+                              <div className="text-sm text-gray-400">
+                                <span className="font-medium">{episode.region === 'se' ? '🇸🇪 Sweden' : '🇺🇸 United States'}</span>
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {formatDate(episode.first_appearance_date)}
+                                {episode.episode_duration && (
+                                  <span> • {episode.episode_duration}</span>
+                                )}
+                              </div>
+                              {episode.episode_description && (
+                                <div className="text-sm text-gray-400 leading-relaxed mt-2">
+                                  <p>
+                                    {expandedEpisodes.has(episode.id) 
+                                      ? episode.episode_description 
+                                      : truncateDescription(episode.episode_description)
+                                    }
+                                  </p>
+                                  {episode.episode_description.length > 150 && (
+                                    <button
+                                      onClick={() => toggleExpanded(episode.id)}
+                                      className="text-blue-400 hover:text-blue-300 text-xs mt-1.5 transition-colors"
+                                    >
+                                      {expandedEpisodes.has(episode.id) ? 'Show Less' : 'Show More'}
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Play Button */}
-                      <div className="flex-shrink-0 flex items-center">
+                      <div className="flex-shrink-0">
                         <Button
                           size="sm"
                           onClick={() => window.open(getSpotifyUrl(episode.episode_uri), '_blank')}
