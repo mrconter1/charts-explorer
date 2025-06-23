@@ -15,7 +15,7 @@ export default function PodcastDashboard() {
   // Use a fixed date initially to avoid hydration mismatch
   const [currentDate, setCurrentDate] = useState(new Date('2024-12-15'));
   const [timeWindow, setTimeWindow] = useState<TimeWindow>('week');
-  const [region, setRegion] = useState<Region>('se');
+  const [selectedRegions, setSelectedRegions] = useState<Region[]>(['se', 'us']);
   const [mounted, setMounted] = useState(false);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,13 +40,25 @@ export default function PodcastDashboard() {
       setError(null);
       
       try {
-        const data = await fetchTopEpisodes({
-          region,
-          timeWindow,
-          currentDate,
-          limit: 100
-        });
-        setEpisodes(data);
+        // Fetch episodes from all selected regions
+        const episodePromises = selectedRegions.map(region =>
+          fetchTopEpisodes({
+            region,
+            timeWindow,
+            currentDate,
+            limit: 100
+          })
+        );
+        
+        const regionEpisodes = await Promise.all(episodePromises);
+        
+        // Combine and sort all episodes by score (descending)
+        const combinedEpisodes = regionEpisodes
+          .flat()
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 100); // Keep top 100 overall
+        
+        setEpisodes(combinedEpisodes);
         
         // Also fetch all episodes for search (if not already fetched)
         if (allEpisodes.length === 0) {
@@ -65,7 +77,7 @@ export default function PodcastDashboard() {
     };
 
     loadEpisodes();
-  }, [mounted, region, timeWindow, currentDate]);
+  }, [mounted, selectedRegions, timeWindow, currentDate]);
 
   const handleTimeWindowNavigation = (direction: 'prev' | 'next') => {
     if (timeWindow === 'all') return; // Can't navigate in "all" mode
@@ -79,6 +91,18 @@ export default function PodcastDashboard() {
     if (newTimeWindow !== 'all') {
       setCurrentDate(new Date());
     }
+  };
+
+  const toggleRegion = (region: Region) => {
+    setSelectedRegions(prev => {
+      if (prev.includes(region)) {
+        // Don't allow deselecting all regions
+        if (prev.length === 1) return prev;
+        return prev.filter(r => r !== region);
+      } else {
+        return [...prev, region];
+      }
+    });
   };
 
   // Check if navigating forward would go into the future
@@ -239,17 +263,32 @@ export default function PodcastDashboard() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium flex items-center gap-2 text-gray-300">
                     <Globe className="h-4 w-4 text-cyan-400" />
-                    Region
+                    Regions
                   </label>
-                  <Select value={region} onValueChange={(value: Region) => setRegion(value)}>
-                    <SelectTrigger className="w-full border-gray-700 bg-gray-800 text-gray-200">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="border-gray-700 bg-gray-800">
-                      <SelectItem value="se" className="text-gray-200 focus:bg-gray-700">🇸🇪 Sweden</SelectItem>
-                      <SelectItem value="us" className="text-gray-200 focus:bg-gray-700">🇺🇸 United States</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => toggleRegion('se')}
+                      variant={selectedRegions.includes('se') ? 'default' : 'outline'}
+                      className={`flex-1 h-9 ${
+                        selectedRegions.includes('se')
+                          ? 'bg-cyan-600 hover:bg-cyan-700 text-white border-cyan-600'
+                          : 'border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700'
+                      }`}
+                    >
+                      SE
+                    </Button>
+                    <Button
+                      onClick={() => toggleRegion('us')}
+                      variant={selectedRegions.includes('us') ? 'default' : 'outline'}
+                      className={`flex-1 h-9 ${
+                        selectedRegions.includes('us')
+                          ? 'bg-cyan-600 hover:bg-cyan-700 text-white border-cyan-600'
+                          : 'border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700'
+                      }`}
+                    >
+                      US
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Time Window Selection */}
@@ -262,7 +301,7 @@ export default function PodcastDashboard() {
                     value={timeWindow} 
                     onValueChange={(value: TimeWindow) => handleTimeWindowChange(value)}
                   >
-                    <SelectTrigger className="w-full border-gray-700 bg-gray-800 text-gray-200">
+                    <SelectTrigger className="w-full h-9 border-gray-700 bg-gray-800 text-gray-200">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="border-gray-700 bg-gray-800">
