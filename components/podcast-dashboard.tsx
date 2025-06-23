@@ -318,27 +318,28 @@ export default function PodcastDashboard() {
               {/* Time Navigation - Separate Row */}
               {timeWindow !== 'all' && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">Date Range</label>
+                  <label className="text-sm font-medium flex items-center gap-2 text-gray-300">
+                    <Calendar className="h-4 w-4 text-purple-400" />
+                    Date Range
+                  </label>
                   <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
-                      size="sm"
                       onClick={() => handleTimeWindowNavigation('prev')}
-                      className="flex items-center justify-center gap-1 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 px-2"
+                      className="h-9 flex items-center justify-center gap-1 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 px-2"
                       disabled={loading}
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     
-                    <div className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-center flex-1">
+                    <div className="h-9 px-3 bg-gray-800 border border-gray-700 rounded-md text-center flex-1 flex items-center justify-center">
                       <span className="font-medium text-gray-200 text-sm">{dateRangeText}</span>
                     </div>
                     
                     <Button
                       variant="outline"
-                      size="sm"
                       onClick={() => handleTimeWindowNavigation('next')}
-                      className="flex items-center justify-center gap-1 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 px-2"
+                      className="h-9 flex items-center justify-center gap-1 border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 px-2"
                       disabled={loading || wouldGoIntoFuture('next')}
                     >
                       <ChevronRight className="h-4 w-4" />
