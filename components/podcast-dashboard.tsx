@@ -485,17 +485,17 @@ export default function PodcastDashboard() {
                       <div className="flex-grow min-w-0">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-grow min-w-0">
-                            <h3 className="font-semibold text-base text-gray-100 leading-tight mb-2">
+                            <h3 className="font-semibold text-base text-gray-100 leading-tight mb-2 break-words overflow-hidden">
                               {episode.episode_name}
                             </h3>
                             <div className="space-y-1.5">
                               <div className="text-sm text-gray-400">
                                 <Link 
                                   href={`/podcast/${encodeURIComponent(getShowId(episode.show_uri))}`}
-                                  className="font-medium hover:text-blue-400 transition-colors cursor-pointer flex items-center gap-1"
+                                  className="font-medium hover:text-blue-400 transition-colors cursor-pointer flex items-center gap-1 min-w-0"
                                 >
-                                  <span>{episode.show_name}</span>
-                                  <ArrowRight className="h-3 w-3" />
+                                  <span className="break-words overflow-hidden">{episode.show_name}</span>
+                                  <ArrowRight className="h-3 w-3 flex-shrink-0" />
                                 </Link>
                               </div>
                               <div className="text-xs text-gray-500">
@@ -507,7 +507,7 @@ export default function PodcastDashboard() {
                               </div>
                               {episode.episode_description && (
                                 <div className="text-sm text-gray-400 leading-relaxed mt-2">
-                                  <p>
+                                  <p className="break-words overflow-hidden">
                                     {expandedEpisodes.has(episode.id) 
                                       ? episode.episode_description 
                                       : truncateDescription(episode.episode_description)
