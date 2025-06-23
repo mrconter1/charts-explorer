@@ -503,6 +503,7 @@ export default function PodcastDashboard() {
                                 {episode.episode_duration && (
                                   <span> • {episode.episode_duration}</span>
                                 )}
+                                <span> • {episode.region.toUpperCase()}</span>
                               </div>
                               {episode.episode_description && (
                                 <div className="text-sm text-gray-400 leading-relaxed mt-2">
