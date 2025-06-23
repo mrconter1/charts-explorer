@@ -25,11 +25,51 @@ export default function PodcastDashboard() {
   const [allEpisodes, setAllEpisodes] = useState<Episode[]>([]);
   const [expandedEpisodes, setExpandedEpisodes] = useState<Set<number>>(new Set());
 
-  // Set actual current date after component mounts
+  // Set actual current date after component mounts and load saved settings
   useEffect(() => {
     setMounted(true);
-    setCurrentDate(new Date());
+    
+    // Load saved settings from localStorage
+    try {
+      const savedSettings = localStorage.getItem('podcast-dashboard-settings');
+      if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        
+        if (settings.selectedRegions && Array.isArray(settings.selectedRegions)) {
+          setSelectedRegions(settings.selectedRegions);
+        }
+        if (settings.timeWindow) {
+          setTimeWindow(settings.timeWindow);
+        }
+        if (settings.currentDate && settings.timeWindow !== 'all') {
+          setCurrentDate(new Date(settings.currentDate));
+        } else {
+          setCurrentDate(new Date());
+        }
+      } else {
+        setCurrentDate(new Date());
+      }
+    } catch (error) {
+      console.error('Failed to load saved settings:', error);
+      setCurrentDate(new Date());
+    }
   }, []);
+
+  // Save settings to localStorage whenever they change
+  useEffect(() => {
+    if (!mounted) return;
+    
+    try {
+      const settings = {
+        selectedRegions,
+        timeWindow,
+        currentDate: currentDate.toISOString()
+      };
+      localStorage.setItem('podcast-dashboard-settings', JSON.stringify(settings));
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+    }
+  }, [mounted, selectedRegions, timeWindow, currentDate]);
 
   // Fetch episodes when filters change
   useEffect(() => {
