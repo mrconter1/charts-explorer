@@ -2,7 +2,7 @@
 
 A **mobile-first podcast analytics dashboard** that tracks and visualizes Spotify podcast episode rankings across different regions and time periods. Built with Next.js 15 and powered by real-time data from Supabase.
 
-[Insert Image of Website]
+![image](https://github.com/user-attachments/assets/d28d5c78-259e-46ce-911b-bd4a06f9ea56)
 
 ## 🌟 Features
 
